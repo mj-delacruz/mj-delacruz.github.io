@@ -5,89 +5,74 @@
 Portfolio site. Graphic artist in Mandaue City, Cebu — custom motorcycle decals,
 vehicle graphics, die-cut stickers and pattern making on Graphtec plotters.
 
-Plain HTML and CSS, one page, no framework and no build step — which is exactly
-what GitHub Pages is good at.
+The whole page is a small 3D studio built with Three.js: a cutting plotter that
+cuts stickers on a loop, a design desk, a vinyl rack, and her real work framed on
+the walls. Plain HTML, CSS and JavaScript — no framework and no build step, which
+is exactly what GitHub Pages is good at. Three.js loads from jsDelivr.
+
+## Getting around
+
+| Hotspot | Opens |
+|---|---|
+| Desk and monitor | About |
+| Plotter | Services |
+| Wall frames | Portfolio (clicking a frame opens that piece) |
+| Neon sign | Contact |
+
+The dock at the bottom opens the same panels, and each panel has its own URL
+(`#about`, `#services`, `#work`, `#contact`). Drag to orbit; scroll or pinch to zoom.
 
 ## Design
 
-The visual system is built from the vocabulary of a cutting plotter, because that
-is what the work actually is: dashed **contour paths** offset from an edge,
-**registration crosshairs** on the service cards, a **nesting grid** behind the
-hero, and a diagonal **weeding hatch** standing in for portfolio images.
-
 | Token | Hex | Role |
 |---|---|---|
-| `--paper` | `#fdfdfd` | Page ground (light) |
+| `--paper` | `#fdfdfd` | Panels |
 | `--blush` | `#fec7ca` | Tints, soft type on black |
 | `--coral` | `#fd8f96` | The cut line — primary accent |
-| `--rose`  | `#7f484b` | Deep accent, rules, headings |
-| `--ink`   | `#000000` | Hero, contact and footer ground |
-
-Neutrals are biased toward rose rather than pure grey. Both light and dark themes
-are defined token-level at the top of `assets/css/style.css`; the toggle in the
-header persists to `localStorage`, and with no stored choice the OS decides.
+| `--rose`  | `#7f484b` | Deep accent, labels |
+| `--ink`   | `#000000` | Buttons, intro ground |
 
 Type: **Bricolage Grotesque** (display), **Instrument Sans** (body),
-**Martian Mono** (labels and readouts).
+**Martian Mono** (labels).
 
 ## Files
 
 | File | Contents |
 |---|---|
-| `index.html` | The whole site — hero, about, services, portfolio, contact |
-| `assets/css/style.css` | Tokens, layout, and the intro styles at the bottom |
-| `assets/js/intro.js` | The orbit intro sequence |
-| `assets/js/site.js` | Nav, theme, reveals, ticker, portfolio tiles |
+| `index.html` | Page shell — intro, brand, dock, drawer, lightbox |
+| `assets/css/style.css` | Tokens and all styles |
+| `assets/js/site.js` | Panel content, the `WORK` list, drawer, lightbox, intro |
+| `assets/js/room.js` | The 3D studio, camera moves, pins and hover |
+| `assets/img/works/` | Full-size portfolio images (max 1400px) |
+| `assets/img/thumbs/` | 640px versions, used for the grid and the wall frames |
 | `404.html` | Uses absolute paths, so it serves at any depth |
+
+`site.js` runs on its own. If WebGL or the CDN fails, the room is replaced by her
+portrait and every panel still opens from the dock.
 
 ## The intro
 
-It is a loading beat that becomes the page. Four tool marks orbit a sphere that
-grows from a dot; the spin eases to zero, the marks snap into a centred row, the
-name resolves — and then the whole arrangement flies into the hero standing behind
-it: marks left into `#toolstrip`, sphere right into `#heroshot`, morphing from a
-circle into the portrait frame while the photo cross-fades in.
+A die-cut sticker: the blade traces the contour, the sticker fills with her name,
+then it peels away while the studio builds itself behind it. It plays once per
+browser session, is skippable (button, `Esc`, `Space`, `Enter`, or a click), and
+never plays under `prefers-reduced-motion: reduce`.
 
-The flying pieces are **clones of the real hero elements**, so the marks have one
-source of truth — the `.tool` markup in `index.html`. Add or remove one there and
-the intro follows; the alignment maths is written for any `N`.
+## Adding portfolio pieces
 
-- Plays on **every visit**, since it doubles as the page reveal.
-- Skippable — the Skip button, `Esc`, `Space`, `Enter`, or a click on the backdrop.
-  Skipping jumps straight to the settled hero.
-- Never plays under `prefers-reduced-motion: reduce`.
-- Built entirely in `intro.js`, so with JavaScript off you simply get the hero.
-
-Timings are the `SEQ` object at the top of `assets/js/intro.js` — `grow`, `align`,
-`text`, `hold`, `settle`, in milliseconds.
-
-### How the handover works
-
-`<html>` carries the state, set by an inline script **before first paint** so the
-hero never flashes past:
-
-| Class | Meaning |
-|---|---|
-| `intro-run` | Overlay is up. Header, ticker and hero copy hidden, scroll locked. |
-| `intro-landing` | Backdrop has cleared, but the real marks and photo stay hidden — the flying copies have not landed yet. |
-| `intro-settle` | Finished. Everything visible; this one stays for good. |
-
-An inline failsafe clears `intro-run` after five seconds if `intro.js` never loads,
-so a blocked script can never leave the hero invisible.
-
-## Adding portfolio images
-
-1. Drop the file into `assets/img/work/`.
-2. Add an `img` key to that entry in the `WORK` list in `assets/js/site.js`:
+1. Export two JPEGs with the same name: a full-size one (about 1400px on the long
+   side) into `assets/img/works/`, and a 640px one into `assets/img/thumbs/`.
+2. Add an entry to the `WORK` list in `assets/js/site.js`, with the thumb's size:
 
 ```js
-{ tag: "Motorcycle", cap: "Custom body skin, full wrap", img: "bike-01.jpg" },
+{ file: "moto-new-kit", cat: "decals", title: "New body kit", w: 640, h: 300 },
 ```
 
-Entries without an `img` render the hatch placeholder, so the grid is never broken
-while the photos are still coming.
+Categories are the `CATS` list just above it. To hang a piece on the studio wall,
+add a `frame(...)` line in `assets/js/room.js`.
 
 ## Local preview
+
+`room.js` is an ES module, so open the site through a server, not `file://`:
 
 ```bash
 python3 -m http.server 8000
