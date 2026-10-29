@@ -189,9 +189,15 @@ screenImg.src = 'assets/img/thumbs/logo-mayong-bago.jpg';
 // keyboard, mouse, pen tablet
 rbox(0.26, 0.025, 0.75, 0.01, mat(C.white, 0.5), -2.98, 1.115, 0.45);
 for (let i = 0; i < 4; i++) box(0.035, 0.006, 0.66, mat('#d9d2d4'), -3.07 + i * 0.06, 1.13, 0.45, { cast: false });
-rbox(0.1, 0.03, 0.06, 0.012, mat(C.white, 0.5), -2.98, 1.115, 0.95);
-rbox(0.34, 0.015, 0.46, 0.008, mat(C.ink, 0.5), -3.15, 1.108, 1.33);
-cyl(0.008, 0.008, 0.26, mat(C.coral), -3.0, 1.125, 1.33, { rx: Math.PI / 2, rz: 0.3, seg: 8 });
+rbox(0.24, 0.006, 0.28, 0.003, mat(C.blush, 0.8), -2.98, 1.103, -0.09, { cast: false });
+rbox(0.11, 0.035, 0.065, 0.016, mat(C.ink, 0.4), -2.98, 1.122, -0.09);
+rbox(0.26, 0.018, 0.36, 0.012, mat(C.ink, 0.4), -3.15, 1.109, 1.33);
+add(new THREE.Mesh(new THREE.PlaneGeometry(0.31, 0.21), new THREE.MeshBasicMaterial({ color: '#2a2427', toneMapped: false })),
+    -3.15, 1.1185, 1.33, { rx: -Math.PI / 2, rz: Math.PI / 2, cast: false });
+const tabletArt = new THREE.MeshBasicMaterial({ color: '#2a2427', toneMapped: false });
+add(new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.18), tabletArt), -3.15, 1.119, 1.33, { rx: -Math.PI / 2, rz: Math.PI / 2, cast: false });
+loadTex('assets/img/thumbs/logo-tigbaw.jpg', t => { tabletArt.map = t; tabletArt.color.set(0xffffff); tabletArt.needsUpdate = true; });
+cyl(0.007, 0.007, 0.22, mat(C.coral), -2.97, 1.108, 1.33, { rx: Math.PI / 2, rz: 0.25, seg: 8 });
 // lamp, mug, plant
 cyl(0.11, 0.12, 0.03, mat(C.ink, 0.4), -3.58, 1.115, -0.45);
 cyl(0.014, 0.014, 0.55, mat(C.ink, 0.4), -3.53, 1.38, -0.45, { rz: -0.22, seg: 8 });
@@ -200,7 +206,7 @@ add(shade, -3.43, 1.66, -0.42, { rz: -2.2 });
 const lampLight = new THREE.PointLight(0xffd6b0, 0.8, 2.6, 2);
 lampLight.position.set(-3.33, 1.55, -0.35);
 cur.add(lampLight);
-cyl(0.05, 0.045, 0.1, mat(C.coral, 0.4), -3.0, 1.15, -0.15);
+cyl(0.05, 0.045, 0.1, mat(C.coral, 0.4), -3.3, 1.15, -0.15);
 cyl(0.1, 0.08, 0.18, mat(C.white, 0.6), -3.55, 1.19, 1.63);
 for (let i = 0; i < 6; i++) {
   const a = i * 1.05;
@@ -278,39 +284,200 @@ part('lean', 'above');
 });
 
 /* ---- weeding table ----------------------------------------------------- */
+// standing height, level with the desk top (y = 1.1)
 part('table', 'above');
-rbox(1.8, 0.06, 1.0, 0.02, mat(C.white, 0.6), 1.2, 0.82, 0.4);
-for (const x of [0.4, 2.0]) for (const z of [0.0, 0.8]) cyl(0.025, 0.025, 0.8, mat(C.ink, 0.4), x, 0.4, z, { seg: 12 });
+rbox(1.8, 0.06, 1.0, 0.02, mat(C.white, 0.6), 1.2, 1.07, 0.4);
+for (const x of [0.4, 2.0]) for (const z of [0.0, 0.8]) cyl(0.025, 0.025, 1.05, mat(C.ink, 0.4), x, 0.525, z, { seg: 12 });
 const matTex = canvasTex(512, 280, drawMat);
-add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.008, 0.8), new THREE.MeshStandardMaterial({ map: matTex, roughness: 0.8 })), 1.2, 0.854, 0.4, { cast: false });
-box(0.62, 0.004, 0.42, mat(C.blush, 0.6), 0.95, 0.861, 0.35, { ry: 0.12, cast: false });
-for (let i = 0; i < 3; i++) cyl(0.06, 0.06, 0.004, mat([C.coral, C.rose, '#f6c453'][i], 0.5), 0.8 + i * 0.16, 0.865, 0.33 + (i % 2) * 0.08, { cast: false });
-for (let i = 0; i < 3; i++) box(0.46, 0.004, 0.32, mat(['#ffffff', '#5aa9e6', C.coral][i], 0.6), 1.62, 0.861 + i * 0.005, 0.62, { ry: -0.08 + i * 0.07, cast: false });
-rbox(0.24, 0.04, 0.08, 0.015, mat(C.coral, 0.5), 1.75, 0.88, 0.22, { ry: 0.5 });
-cyl(0.008, 0.008, 0.2, mat(C.steel, 0.3, 0.7), 1.4, 0.866, 0.15, { rx: Math.PI / 2, rz: 1.2, seg: 6 });
+add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.008, 0.8), new THREE.MeshStandardMaterial({ map: matTex, roughness: 0.8 })), 1.2, 1.104, 0.4, { cast: false });
+box(0.62, 0.004, 0.42, mat(C.blush, 0.6), 0.95, 1.111, 0.38, { ry: 0.12, cast: false });
+for (let i = 0; i < 3; i++) cyl(0.06, 0.06, 0.004, mat([C.coral, C.rose, '#f6c453'][i], 0.5), 0.8 + i * 0.16, 1.115, 0.36 + (i % 2) * 0.08, { cast: false });
+for (let i = 0; i < 3; i++) box(0.46, 0.004, 0.32, mat(['#ffffff', '#5aa9e6', C.coral][i], 0.6), 1.62, 1.111 + i * 0.005, 0.62, { ry: -0.08 + i * 0.07, cast: false });
+cyl(0.008, 0.008, 0.2, mat(C.steel, 0.3, 0.7), 1.72, 1.116, 0.45, { rx: Math.PI / 2, rz: 1.2, seg: 6 });
+
+/* ---- Mary Jane at the table ---------------------------------------------
+   Her VRoid model (MJ_MODEL) stands behind the weeding table, facing the
+   room, smoothing a decal down with a squeegee. Both arms are posed with
+   two-bone IK (solveArm); the squeegee hand is re-aimed every frame by
+   poseMJ and the squeegee is slid under her palm after the skeleton
+   updates. A flat palm on a block reads well without finger posing.     */
+part('mj', 'above');
+const mj = new THREE.Group();
+mj.position.set(1.2, 0, -0.36);
+cur.add(mj);
+const TABLE_TOP = 1.11;
+// the decal she's applying, under its clear transfer tape
+box(0.56, 0.004, 0.14, mat('#f6c453', 0.6), 1.15, TABLE_TOP + 0.002, 0.06, { cast: false });
+box(0.6, 0.002, 0.17, new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.2, transparent: true, opacity: 0.35 }), 1.15, TABLE_TOP + 0.005, 0.06, { cast: false });
+// the squeegee, its felt edge on the table at the origin
+const squeegee = new THREE.Group();
+squeegee.visible = false;
+mj.add(squeegee);
+cur = squeegee;
+rbox(0.06, 0.05, 0.12, 0.014, mat(C.coral, 0.5), 0, 0.028, 0);
+box(0.014, 0.006, 0.12, mat(C.ink, 0.9), -0.016, 0.003, 0, { cast: false });
+cur = scene.getObjectByName('mj');
+
+const MJ_MODEL = 'assets/models/mj.vrm';
+const MJ_SCALE = 1.3;
+const ELBOW_R = new THREE.Vector3(-1, -0.6, -0.4), ELBOW_L = new THREE.Vector3(1, -0.6, -0.4);
+const _dir = new THREE.Vector3(), _bend = new THREE.Vector3(), _elbow = new THREE.Vector3(), _fore = new THREE.Vector3(), _q = new THREE.Quaternion();
+const _grip = new THREE.Vector3(), _target = new THREE.Vector3();
+const DOWN = new THREE.Vector3(0, -1, 0), _palm = new THREE.Vector3(), _want = new THREE.Vector3(), _twist = new THREE.Quaternion();
+const _bx = new THREE.Vector3(), _by = new THREE.Vector3(), _bz = new THREE.Vector3(), _basis = new THREE.Matrix4(), _hand = new THREE.Quaternion();
+const FINGERS_R = new THREE.Vector3(0.3, -0.15, 1).normalize(), FINGERS_L = new THREE.Vector3(-0.3, -0.1, 1).normalize();
+let avatar = null;
+
+// two-bone arm IK on the VRM's normalized bones: in the rest T-pose every
+// normalized bone has an identity rotation, so the model's own space works
+// as the upper arm's parent frame. The elbow bends toward `pole`, and the
+// forearm is twisted so the palm (facing down in the T-pose) faces the table.
+// The hand is then aimed outright: fingers along `fingers`, palm flat down.
+function solveArm(arm, target, pole, fingers) {
+  const { up, lo, hand, sign, s, a, b, rest } = arm;
+  _dir.copy(target).sub(s);
+  const d = Math.min(_dir.length(), a + b - 1e-4);
+  _dir.normalize();
+  const along = (a * a - b * b + d * d) / (2 * d), h = Math.sqrt(Math.max(0, a * a - along * along));
+  _bend.copy(pole).addScaledVector(_dir, -pole.dot(_dir)).normalize();
+  _elbow.copy(s).addScaledVector(_dir, along).addScaledVector(_bend, h);
+  up.quaternion.setFromUnitVectors(rest, _fore.copy(_elbow).sub(s).normalize());
+  _q.setFromUnitVectors(rest, _fore.copy(s).addScaledVector(_dir, d).sub(_elbow).normalize());
+  _palm.copy(DOWN).applyQuaternion(_q).addScaledVector(_fore, -_palm.dot(_fore)).normalize();
+  _want.copy(DOWN).addScaledVector(_fore, -DOWN.dot(_fore)).normalize();
+  const turn = Math.acos(THREE.MathUtils.clamp(_palm.dot(_want), -1, 1));
+  _twist.setFromAxisAngle(_fore, _palm.cross(_want).dot(_fore) < 0 ? -turn : turn);
+  _q.premultiply(_twist);
+  lo.quaternion.copy(up.quaternion).invert().multiply(_q);
+  // rest hand: fingers along ±x (sign), palm toward -y
+  _bx.copy(fingers).multiplyScalar(sign);
+  _by.copy(DOWN).addScaledVector(fingers, -DOWN.dot(fingers)).normalize().negate();
+  _bz.crossVectors(_bx, _by);
+  _hand.setFromRotationMatrix(_basis.makeBasis(_bx, _by, _bz));
+  hand.quaternion.copy(_q).invert().multiply(_hand);
+}
+
+// u in 0..1 is how far across the decal the squeegee has swept
+function poseMJ(u) {
+  if (!avatar) return;
+  solveArm(avatar.right, _target.set(-0.26 + u * 0.26, TABLE_TOP + 0.07, 0.3), ELBOW_R, FINGERS_R);
+  avatar.head.rotation.y = -0.15 + u * 0.12;
+}
+
+// the squeegee sits under her knuckles, so her curled fingers wrap its front edge
+function placeSqueegee() {
+  mj.worldToLocal(avatar.grip.getWorldPosition(_grip));
+  squeegee.position.set(_grip.x, TABLE_TOP, _grip.z - 0.02);
+}
+
+Promise.all([import('three/addons/loaders/GLTFLoader.js'), import('@pixiv/three-vrm')])
+  .then(([{ GLTFLoader }, { VRMLoaderPlugin, VRMUtils }]) => {
+    const gl = new GLTFLoader();
+    gl.register(p => new VRMLoaderPlugin(p));
+    return gl.loadAsync(MJ_MODEL).then(gltf => {
+      const vrm = gltf.userData.vrm;
+      VRMUtils.rotateVRM0(vrm);
+      vrm.scene.scale.setScalar(MJ_SCALE);
+      vrm.scene.position.z = 0.08;
+      vrm.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
+      mj.add(vrm.scene);
+      vrm.update(0);
+      mj.updateWorldMatrix(true, true);
+      const bone = n => vrm.humanoid.getNormalizedBoneNode(n);
+      const at = o => mj.worldToLocal(o.getWorldPosition(new THREE.Vector3()));
+      const arm = side => {
+        const up = bone(side + 'UpperArm'), lo = bone(side + 'LowerArm');
+        const s = at(up), e = at(lo), w = at(bone(side + 'Hand'));
+        return {
+          up, lo, hand: bone(side + 'Hand'), sign: side === 'right' ? -1 : 1,
+          s, a: s.distanceTo(e), b: e.distanceTo(w), rest: e.clone().sub(s).normalize()
+        };
+      };
+      avatar = {
+        vrm, head: bone('head'), right: arm('right'), left: arm('left'),
+        grip: vrm.humanoid.getRawBoneNode('rightMiddleProximal') || vrm.humanoid.getRawBoneNode('rightHand')
+      };
+      // fingers curled toward the palm. In the
+      // T-pose the right fingers point -x and the left +x, so a curl
+      // toward the palm is +z on the right and -z on the left.
+      const curl = (side, k) => {
+        const sign = side === 'right' ? 1 : -1;
+        for (const f of ['Index', 'Middle', 'Ring', 'Little']) {
+          ['Proximal', 'Intermediate', 'Distal'].forEach((j, i) => {
+            const b = bone(side + f + j);
+            if (b) b.rotation.z = sign * k * [1, 1.3, 0.9][i];
+          });
+        }
+        const thumb = bone(side + 'ThumbProximal');
+        if (thumb) thumb.rotation.y = sign * k * 0.6;
+      };
+      curl('right', 0.5);
+      curl('left', 0.12);
+      bone('neck').rotation.x = 0.2;
+      avatar.head.rotation.x = 0.35;
+      solveArm(avatar.left, new THREE.Vector3(0.24, TABLE_TOP + 0.035, 0.28), ELBOW_L, FINGERS_L);
+      poseMJ(0.5);
+      // settle the spring bones (hair, sleeves) on the pose, not the T-pose
+      vrm.update(0);
+      mj.updateWorldMatrix(true, true);
+      vrm.springBoneManager?.reset();
+      placeSqueegee();
+      squeegee.visible = true;
+    });
+  })
+  .catch(err => console.warn('MJ model not loaded', err));
 
 part('rug', 'grow');
 cyl(1.4, 1.4, 0.012, mat(C.coral, 0.95), 0.9, 0.006, 0.7, { seg: 64, cast: false });
 cyl(1.3, 1.3, 0.016, mat('#fbdedd', 0.95), 0.9, 0.008, 0.7, { seg: 64, cast: false });
 
-/* ---- helmet on a stool ------------------------------------------------- */
-part('helmet', 'above');
-cyl(0.3, 0.3, 0.06, mat(C.white, 0.6), 2.8, 0.55, 1.9);
-cyl(0.035, 0.035, 0.52, mat(C.ink, 0.4), 2.8, 0.27, 1.9, { seg: 12 });
-cyl(0.22, 0.24, 0.03, mat(C.ink, 0.4), 2.8, 0.015, 1.9);
-// open-face shell: the top of a sphere, a dark visor facing the room, a blush racing stripe
-// phi 3π/4 faces the camera; the stripe runs over the crown along that line
-const HX = 2.8, HY = 0.66, HZ = 1.9, FRONT = Math.PI * 0.75;
-const hseg = (r, m, phi0, phiLen, th0, thLen) => {
-  const s = add(new THREE.Mesh(new THREE.SphereGeometry(r, 32, 20, phi0, phiLen, th0, thLen), m), HX, HY, HZ, { cast: m === shellMat });
-  s.scale.set(1, 1, 1.12);
-  return s;
+/* ---- mini dirt bike ---------------------------------------------------
+   A pit bike wearing one of her decal kits. Built along local +x (front)
+   with its left side facing +z, then turned to show that side to camera. */
+part('bike', 'above');
+const bike = new THREE.Group();
+bike.position.set(3.0, 0, 2.0);
+bike.rotation.y = Math.PI / 4;
+cur.add(bike);
+cur = bike;
+const kitTex = canvasTex(640, 256, drawKit);
+const plateTex = canvasTex(320, 192, drawPlate);
+if (document.fonts) document.fonts.load('800 150px "Bricolage Grotesque"').then(() => { kitTex.redraw(); plateTex.redraw(); }).catch(() => {});
+// the same print on both sides of a panel whose faces sit at ±z
+const decal = (t, w, h, x, y, z) => {
+  const m = new THREE.MeshStandardMaterial({ map: t, roughness: 0.4 });
+  for (const s of [1, -1]) add(new THREE.Mesh(new THREE.PlaneGeometry(w, h), m), x, y, s * z, { ry: s < 0 ? Math.PI : 0, cast: false });
 };
-const shellMat = mat(C.coral, 0.3);
-hseg(0.22, shellMat, 0, Math.PI * 2, 0, 1.9);
-hseg(0.223, mat(C.blush, 0.35), FRONT - 0.12, 0.24, 0, 1.0);
-hseg(0.223, mat(C.blush, 0.35), FRONT - Math.PI - 0.12, 0.24, 0, 1.9);
-hseg(0.226, mat('#2b2f3a', 0.15, 0.3), FRONT - 0.6, 1.2, 1.05, 0.5);
+// wheels
+for (const x of [-0.4, 0.42]) {
+  add(new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.048, 12, 36), mat(C.ink, 0.85)), x, 0.218, 0);
+  cyl(0.135, 0.135, 0.03, mat(C.steel, 0.3, 0.6), x, 0.218, 0, { rx: Math.PI / 2, seg: 32 });
+  cyl(0.04, 0.04, 0.13, mat(C.ink, 0.4), x, 0.218, 0, { rx: Math.PI / 2, seg: 12 });
+}
+// engine and exhaust
+rbox(0.3, 0.24, 0.18, 0.04, mat(C.ink, 0.45), 0.02, 0.36, 0);
+for (let i = 0; i < 3; i++) box(0.2, 0.012, 0.19, mat(C.steel, 0.3, 0.6), 0.04, 0.42 + i * 0.03, 0, { cast: false });
+cyl(0.025, 0.025, 0.5, mat(C.steel, 0.25, 0.7), -0.2, 0.52, -0.1, { rz: 1.35, seg: 10 });
+cyl(0.045, 0.045, 0.2, mat(C.steel, 0.25, 0.7), -0.46, 0.58, -0.1, { rz: 1.35, seg: 16 });
+// swingarm and shock
+for (const z of [-0.06, 0.06]) box(0.42, 0.04, 0.025, mat(C.steel, 0.3, 0.6), -0.2, 0.26, z, { rz: 0.2 });
+cyl(0.03, 0.03, 0.36, mat(C.coral, 0.4), -0.12, 0.47, 0, { rz: -0.35, seg: 12 });
+// frame, forks, bars
+cyl(0.02, 0.02, 0.4, mat(C.ink, 0.4), 0.2, 0.57, 0, { rz: -0.52, seg: 10 });
+for (const z of [-0.07, 0.07]) cyl(0.022, 0.022, 0.58, mat(C.steel, 0.25, 0.7), 0.36, 0.49, z, { rz: 0.22, seg: 12 });
+cyl(0.014, 0.014, 0.46, mat(C.ink, 0.4), 0.28, 0.81, 0, { rx: Math.PI / 2, seg: 10 });
+for (const z of [-0.2, 0.2]) cyl(0.02, 0.02, 0.08, mat(C.coral, 0.6), 0.28, 0.81, z, { rx: Math.PI / 2, seg: 10 });
+// bodywork: tank shrouds, seat, side plates, fenders, front plate
+rbox(0.36, 0.17, 0.22, 0.02, mat(C.coral, 0.4), 0.12, 0.66, 0);
+decal(kitTex, 0.3, 0.12, 0.12, 0.66, 0.111);
+rbox(0.52, 0.06, 0.16, 0.025, mat(C.ink, 0.7), -0.2, 0.74, 0, { rz: -0.04 });
+rbox(0.24, 0.16, 0.17, 0.015, mat(C.white, 0.5), -0.26, 0.6, 0);
+decal(plateTex, 0.2, 0.12, -0.26, 0.6, 0.086);
+rbox(0.4, 0.025, 0.14, 0.012, mat(C.coral, 0.4), -0.5, 0.7, 0, { rz: -0.14 });
+rbox(0.36, 0.025, 0.12, 0.012, mat(C.coral, 0.4), 0.52, 0.47, 0, { rz: 0.12 });
+rbox(0.02, 0.15, 0.18, 0.01, mat(C.white, 0.5), 0.4, 0.68, 0, { rz: 0.22 });
+
+cur = scene.getObjectByName('bike');
 
 /* ---- offcuts on the floor ---------------------------------------------- */
 part('offcuts', 'above');
@@ -362,6 +529,29 @@ function drawNeon(x, w, h) {
   x.font = '600 34px "Martian Mono", monospace';
   x.shadowBlur = 16; x.fillStyle = '#fec7ca';
   x.fillText('✦  OPEN FOR WORK  ✦', w / 2, 262);
+}
+
+// the shroud decal: a slashed coral-and-ink kit with her initials
+function drawKit(x, w, h) {
+  x.fillStyle = '#fd8f96'; x.fillRect(0, 0, w, h);
+  x.fillStyle = '#231d20';
+  for (const [x0, bw] of [[-40, 90], [150, 34], [210, 16]]) {
+    x.beginPath(); x.moveTo(x0, h); x.lineTo(x0 + bw, h); x.lineTo(x0 + bw + 110, 0); x.lineTo(x0 + 110, 0); x.fill();
+  }
+  x.fillStyle = '#fff4f5';
+  x.beginPath(); x.moveTo(250, h); x.lineTo(270, h); x.lineTo(380, 0); x.lineTo(360, 0); x.fill();
+  x.font = '800 130px "Bricolage Grotesque", Helvetica, sans-serif';
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.lineWidth = 10; x.strokeStyle = '#231d20'; x.strokeText('MJ', 500, 136);
+  x.fillStyle = '#fff4f5'; x.fillText('MJ', 500, 136);
+}
+
+function drawPlate(x, w, h) {
+  x.fillStyle = '#fbf8f6'; x.fillRect(0, 0, w, h);
+  x.fillStyle = '#fd8f96'; x.fillRect(0, h - 26, w, 26);
+  x.font = '800 130px "Bricolage Grotesque", Helvetica, sans-serif';
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = '#231d20'; x.fillText('131', w / 2, 86);
 }
 
 function drawMat(x, w, h) {
@@ -668,7 +858,10 @@ function frameLoop() {
   if (built) {
     if (!reduced) cutClock += dt;
     runCut(reduced ? cut.total / cut.speed : cutClock);
+    // slow strokes back and forth across the decal
+    if (!reduced) poseMJ(0.5 - 0.5 * Math.cos(t * 1.4));
   }
+  if (avatar) { avatar.vrm.update(dt); placeSqueegee(); }
   bulbs.forEach((m, i) => { m.emissiveIntensity = reduced ? 1.5 : 1.3 + Math.sin(t * 2 + i * 1.7) * 0.4; });
   const flicker = !built || reduced ? 1 : (Math.sin(t * 37) > 0.97 ? 0.75 : 1);
   neonMat.opacity = flicker;
