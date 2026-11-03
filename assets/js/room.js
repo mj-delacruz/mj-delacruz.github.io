@@ -44,7 +44,7 @@ const WALL_X = -3.8;
 /* ---- palette ----------------------------------------------------------- */
 const C = {
   wallBack: '#f8dedc', wallSide: '#f1cfcf', trim: '#fffaf8',
-  floor: '#e7cbae', plank: '#d0b090',
+  floor: '#6a1426', grout: '#3a0a14',
   white: '#fbf8f6', ink: '#231d20', coral: '#fd8f96', blush: '#fec7ca', rose: '#7f484b',
   steel: '#b5aeb1', leaf: '#6fa487', vinyl: '#fffdfc'
 };
@@ -118,8 +118,10 @@ function canvasTex(w, h, draw) {
 
 /* ---- room shell -------------------------------------------------------- */
 part('floor', 'grow');
-box(8, 0.3, 7.2, mat(C.floor, 0.7), 0, -0.15, 0);
-for (let i = 1; i < 18; i++) box(0.012, 0.004, 7.18, mat(C.plank), -4 + i * 0.444, 0.002, 0, { cast: false });
+// red-wine glossy tiles: a clear-coated slab with grout lines every 0.8
+box(8, 0.3, 7.2, new THREE.MeshPhysicalMaterial({ color: C.floor, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.06 }), 0, -0.15, 0);
+for (let i = 1; i < 10; i++) box(0.014, 0.003, 7.18, mat(C.grout, 0.9), -4 + i * 0.8, 0.0015, 0, { cast: false });
+for (let i = 1; i < 9; i++) box(7.98, 0.003, 0.014, mat(C.grout, 0.9), 0, 0.0015, -3.6 + i * 0.8, { cast: false });
 
 part('walls', 'below');
 box(8, 3.9, 0.2, mat(C.wallBack, 0.9), 0, 1.95, -3.5);
@@ -135,40 +137,90 @@ ground.position.y = -0.3;
 ground.receiveShadow = true;
 scene.add(ground);
 
-/* ---- framed work ------------------------------------------------------- */
-function frame(file, h, wall, at, y) {
+/* ---- framed work: a gallery cluster on the back wall ---------------------
+   Columns of mixed sizes laid out around one centre line. The big frames
+   open the work panel; `small` ones are decoration and take no clicks.  */
+function frame(file, h, x, y, small = false) {
   const w = byFile[file];
   if (!w) return;
   const ph = h, pw = h * (w.w / w.h);
-  const g = part('frame:' + file, 'above', { hotspot: 'work', work: file, label: w.title });
+  const g = part('frame:' + file, 'above', small ? null : { hotspot: 'work', work: file, label: w.title });
+  g.userData.lift = new THREE.Vector3(0, 0, small ? 0 : 0.08);
   const holder = new THREE.Group();
-  if (wall === 'back') {
-    holder.position.set(at, y, WALL_Z);
-    g.userData.lift = new THREE.Vector3(0, 0, 0.08);
-  } else {
-    holder.position.set(WALL_X, y, at);
-    holder.rotation.y = Math.PI / 2;
-    g.userData.lift = new THREE.Vector3(0.08, 0, 0);
-  }
+  holder.position.set(x, y, WALL_Z);
   g.add(holder);
   cur = holder;
-  rbox(pw + 0.12, ph + 0.12, 0.05, 0.012, mat(C.ink, 0.5), 0, 0, 0.025);
-  box(pw + 0.05, ph + 0.05, 0.004, mat(C.white), 0, 0, 0.052, { cast: false });
+  rbox(pw + 0.1, ph + 0.1, 0.04, 0.01, mat('#efe2dc', 0.5), 0, 0, 0.02);
+  box(pw + 0.05, ph + 0.05, 0.004, mat(C.white), 0, 0, 0.042, { cast: false });
   const pm = new THREE.MeshStandardMaterial({ color: C.blush, roughness: 0.5, emissive: 0xffffff, emissiveIntensity: 0 });
-  add(new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), pm), 0, 0, 0.056, { cast: false });
+  add(new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), pm), 0, 0, 0.046, { cast: false });
   loadTex('assets/img/thumbs/' + file + '.jpg', t => {
     pm.map = t; pm.emissiveMap = t; pm.emissiveIntensity = 0.32; pm.color.set(0xffffff); pm.needsUpdate = true;
   });
 }
 
-frame('logo-hangos',         1.0,  'back', -2.75, 2.3);
-frame('diecut-santa-fe-set', 1.05, 'back', -1.5,  2.3);
-frame('label-bisaya-brew',   1.25, 'back', -0.3,  2.3);
-frame('logo-puscc',          1.0,  'back',  0.95, 2.3);
-frame('menu-sabaw',          0.95, 'back',  2.35, 2.3);
-frame('promo-coldstart',     1.2,  'back',  3.5,  2.35);
-frame('moto-fasthouse-red',  0.8,  'left', -2.1,  2.45);
-frame('moto-green-camo',     0.62, 'left', -2.1,  1.5);
+frame('logo-mayong-bago',         0.16, -2.4,  2.74, true);
+frame('stickers-ate-tin',         0.19, -2.4,  2.37, true);
+frame('logo-hangos',              0.5,  -1.81, 2.71);
+frame('logo-racho-architectural', 0.14, -1.81, 2.2,  true);
+frame('label-bisaya-brew',        0.74, -1.1,  2.55);
+frame('moto-fasthouse-red',       0.32, -0.27, 2.88);
+frame('logo-puscc',               0.48, -0.27, 2.29);
+frame('promo-coldstart',          0.84,  0.53, 2.55);
+frame('menu-sabaw',               0.45,  1.26, 2.78);
+frame('campaign-amping-sa-byahe', 0.27,  1.26, 2.23, true);
+frame('moto-green-camo',          0.35,  2.06, 2.84);
+frame('diecut-santa-fe-set',      0.4,   2.06, 2.28);
+frame('menu-pork-chicken',        0.24,  2.79, 3.0,  true);
+frame('tarp-birthday-ezekiel',    0.34,  2.79, 2.52);
+frame('logo-tigbaw',              0.19,  2.79, 2.07, true);
+frame('campaign-one-mandaue',     0.48,  3.43, 2.55);
+
+/* ---- gallery track lights ----------------------------------------------
+   A black rail on wall brackets above the gallery with spotlights angled
+   down at the frames. Real SpotLights (no shadows) light the frames; the
+   room is too bright for their pools to show, so each also gets a painted
+   beam: an arched, soft-edged glow added onto the wall behind the frames. */
+part('track', 'above');
+const TRACK_Y = 3.62, TRACK_Z = WALL_Z + 0.32;
+cyl(0.018, 0.018, 6.6, mat(C.ink, 0.4), 0.55, TRACK_Y, TRACK_Z, { rz: Math.PI / 2, seg: 10 });
+for (const x of [-2.4, 0.55, 3.5]) box(0.03, 0.03, 0.32, mat(C.ink, 0.4), x, TRACK_Y, WALL_Z + 0.16);
+const lensMat = new THREE.MeshBasicMaterial({ color: '#ffd9a3', toneMapped: false });
+const beamTex = canvasTex(256, 512, (x, w, h) => {
+  x.clearRect(0, 0, w, h);
+  const top = 70;
+  const g = x.createLinearGradient(0, top, 0, h);
+  g.addColorStop(0, 'rgba(255,176,98,0.95)');
+  g.addColorStop(0.35, 'rgba(255,176,98,0.55)');
+  g.addColorStop(1, 'rgba(255,176,98,0)');
+  x.fillStyle = g;
+  x.filter = 'blur(10px)';
+  x.beginPath();
+  x.moveTo(w * 0.5, top - 40);
+  x.bezierCurveTo(w * 0.92, top - 30, w * 0.98, h * 0.6, w * 0.96, h);
+  x.lineTo(w * 0.04, h);
+  x.bezierCurveTo(w * 0.02, h * 0.6, w * 0.08, top - 30, w * 0.5, top - 40);
+  x.fill();
+});
+const beamMat = new THREE.MeshBasicMaterial({ map: beamTex, transparent: true, opacity: 0.62, depthWrite: false, toneMapped: false, blending: THREE.AdditiveBlending });
+for (const x of [-1.85, -0.25, 1.35, 2.95]) {
+  cyl(0.008, 0.008, 0.08, mat(C.ink, 0.4), x, TRACK_Y - 0.04, TRACK_Z, { seg: 6 });
+  // the can points from the rail toward the middle of the gallery
+  const can = new THREE.Group();
+  can.position.set(x, TRACK_Y - 0.1, TRACK_Z);
+  can.rotation.x = 0.55;
+  cur.add(can);
+  const keep = cur;
+  cur = can;
+  cyl(0.055, 0.05, 0.17, mat(C.ink, 0.35), 0, -0.06, 0, { seg: 20 });
+  cyl(0.045, 0.045, 0.004, lensMat, 0, -0.146, 0, { seg: 20, cast: false });
+  cur = keep;
+  add(new THREE.Mesh(new THREE.PlaneGeometry(1.25, 2.0), beamMat), x, 2.45, WALL_Z + 0.004, { cast: false });
+  const spot = new THREE.SpotLight(0xffb36b, 3.4, 4.5, 0.42, 0.85, 2);
+  spot.position.set(x, TRACK_Y - 0.18, TRACK_Z - 0.06);
+  spot.target.position.set(x, 2.25, WALL_Z);
+  cur.add(spot, spot.target);
+}
 
 /* ---- design desk (about) ----------------------------------------------- */
 part('desk', 'above', { hotspot: 'about', label: 'About me' });
@@ -278,9 +330,14 @@ ROLLS.forEach((c, i) => {
   const lvl = Math.floor(i / 2), side = i % 2 ? 0.12 : -0.12;
   cyl(0.1, 0.1, 0.82, mat(c, c === '#ffffff' ? 0.4 : 0.55), 3.05, 0.3 + lvl * 0.4, Z0 + side, { rz: Math.PI / 2 });
 });
+// spare rolls propped against the rack's right side panel: each foot
+// stands on the floor and its top rests on the panel face (x = 3.525)
 part('lean', 'above');
-[['#f6c453', 0.18], [C.coral, 0.08], ['#5aa9e6', -0.05]].forEach(([c, tilt], i) => {
-  cyl(0.085, 0.085, 1.15, mat(c, 0.55), 3.65 - i * 0.2, 0.57, -1.75 + i * 0.05, { rz: tilt + 0.08 });
+[['#f6c453', 0.12, -2.93], [C.coral, 0.15, -2.75], ['#5aa9e6', 0.13, -2.57]].forEach(([c, tilt, z]) => {
+  const L = 1.15, r = 0.085, half = L / 2;
+  const topX = 3.525 + r * Math.cos(tilt);
+  const x = topX + half * Math.sin(tilt), y = half * Math.cos(tilt) + r * Math.sin(tilt);
+  cyl(r, r, L, mat(c, 0.55), x, y, z, { rz: tilt });
 });
 
 /* ---- weeding table ----------------------------------------------------- */
@@ -427,9 +484,87 @@ Promise.all([import('three/addons/loaders/GLTFLoader.js'), import('@pixiv/three-
   })
   .catch(err => console.warn('MJ model not loaded', err));
 
+/* ---- cloud rug and its cat ---------------------------------------------
+   A wavy blob rug in concentric tufted bands, pink outside to a cream
+   centre. Each band is the same wobbly outline pulled in by `inset`, laid
+   flat a hair above the last so they never z-fight.                   */
 part('rug', 'grow');
-cyl(1.4, 1.4, 0.012, mat(C.coral, 0.95), 0.9, 0.006, 0.7, { seg: 64, cast: false });
-cyl(1.3, 1.3, 0.016, mat('#fbdedd', 0.95), 0.9, 0.008, 0.7, { seg: 64, cast: false });
+const RUG_X = 0.9, RUG_Z = 0.75, RUG_RX = 1.55, RUG_RZ = 1.3;
+const rugOutline = inset => {
+  const pts = [];
+  for (let i = 0; i < 128; i++) {
+    const t = i / 128 * Math.PI * 2;
+    const wob = 1 + 0.09 * Math.sin(3 * t + 0.4) + 0.05 * Math.sin(5 * t + 1.3);
+    pts.push(new THREE.Vector2((RUG_RX * wob - inset) * Math.cos(t), (RUG_RZ * wob - inset) * Math.sin(t)));
+  }
+  return new THREE.Shape(pts);
+};
+add(new THREE.Mesh(new THREE.ExtrudeGeometry(rugOutline(0.03), { depth: 0.006, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.012, bevelSegments: 4, curveSegments: 4 }),
+    mat('#f4b3bd', 1)), RUG_X, 0.006, RUG_Z, { rx: -Math.PI / 2, cast: false });
+[[0.13, '#fad3d7'], [0.22, '#f4b3bd'], [0.34, '#e8a0ab'], [0.5, '#fbe3e3'], [0.56, '#fbf5ee']].forEach(([inset, c], i) => {
+  add(new THREE.Mesh(new THREE.ShapeGeometry(rugOutline(inset), 4), mat(c, 1)), RUG_X, 0.0255 + i * 0.0008, RUG_Z, { rx: -Math.PI / 2, cast: false });
+});
+
+// a fluffy white cat lying on the rug in front of the table, facing the room
+part('cat', 'above');
+const cat = new THREE.Group();
+cat.position.set(0.8, 0.026, 1.38);
+cat.rotation.y = 0.75;
+cur.add(cat);
+cur = cat;
+const fur = mat('#f7f1ea', 1), furShade = mat('#ece2d6', 1);
+sph(0.16, fur, 0, 0.12, -0.06).scale.set(1.05, 0.72, 1.55);
+sph(0.13, fur, 0, 0.15, 0.17).scale.set(1.05, 0.95, 0.9);
+sph(0.1, fur, 0, 0.08, 0.25).scale.set(1.2, 0.8, 1);
+for (const x of [-1, 1]) {
+  sph(0.05, fur, x * 0.065, 0.04, 0.3).scale.set(0.95, 0.75, 1.6);
+  sph(0.08, fur, x * 0.065, 0.24, 0.3).scale.set(1, 0.85, 0.8);
+  add(new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.085, 12), fur), x * 0.065, 0.375, 0.26, { rz: -x * 0.35, cast: false });
+  add(new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.05, 10), mat('#f4c6c6', 0.9)), x * 0.063, 0.37, 0.272, { rz: -x * 0.35, cast: false });
+  sph(0.017, mat(C.ink, 0.3), x * 0.045, 0.29, 0.378, { cast: false });
+}
+sph(0.12, fur, 0, 0.28, 0.27);
+sph(0.012, mat('#f2a5ad', 0.6), 0, 0.258, 0.39, { cast: false });
+// the tail curls round her left side, thinning toward the tip
+for (let i = 0; i < 9; i++) {
+  const t = i / 8, a = -2.2 + t * 1.5;
+  sph(0.065 - t * 0.022, i % 2 ? furShade : fur, -0.06 + Math.cos(a) * 0.24, 0.06, -0.12 + Math.sin(a) * 0.24);
+}
+cur = scene.getObjectByName('cat');
+
+// a second cat by the mirror: a generated model (Z-up, facing -y in its
+// file, 2.88 units tall) stood upright, its pale fur darkened to charcoal
+part('mirrorCat', 'above');
+const mirrorCat = new THREE.Group();
+mirrorCat.position.set(-3.05, 0, -1.6);
+mirrorCat.rotation.y = 1.1;
+cur.add(mirrorCat);
+import('three/addons/loaders/GLTFLoader.js').then(({ GLTFLoader }) => new GLTFLoader().loadAsync('assets/models/cat.glb')).then(gltf => {
+  gltf.scene.rotation.x = -Math.PI / 2;
+  gltf.scene.scale.setScalar(0.45 / 2.88);
+  const c = new THREE.Color();
+  gltf.scene.traverse(o => {
+    if (!o.isMesh) return;
+    o.castShadow = true;
+    o.receiveShadow = true;
+    // no materials in the file means glTF's fully metallic default, which
+    // renders dark and muddy without an environment map: make it matte fur
+    o.material.metalness = 0;
+    o.material.roughness = 0.9;
+    // greys and creams (low saturation, not near-black) are fur; eyes,
+    // nose and inner ears keep their colours. Vertex colours are linear,
+    // so charcoal on screen means very small values here
+    const col = o.geometry.attributes.color;
+    if (!col) return;
+    for (let i = 0; i < col.count; i++) {
+      c.fromBufferAttribute(col, i);
+      const hi = Math.max(c.r, c.g, c.b), lo = Math.min(c.r, c.g, c.b);
+      if (hi > 0.25 && hi - lo < 0.25 * hi) col.setXYZ(i, 0.022 + c.r * 0.04, 0.019 + c.g * 0.036, 0.019 + c.b * 0.036);
+    }
+    col.needsUpdate = true;
+  });
+  mirrorCat.add(gltf.scene);
+}).catch(err => console.warn('cat model not loaded', err));
 
 /* ---- mini dirt bike ---------------------------------------------------
    A pit bike wearing one of her decal kits. Built along local +x (front)
@@ -479,22 +614,102 @@ rbox(0.02, 0.15, 0.18, 0.01, mat(C.white, 0.5), 0.4, 0.68, 0, { rz: 0.22 });
 
 cur = scene.getObjectByName('bike');
 
+/* ---- left wall: a backlit wavy mirror and a bird of paradise -----------
+   The mirror is frameless: an organic blob outline cut as a thin slab of
+   faked glass (pale blue-grey sheen, soft streaks, no real reflection).
+   Its warm LED backlight is a blurred copy of the outline painted on a
+   plane between glass and wall, plus a faint point light on the wall. */
+part('mirror', 'above');
+const MIRROR_W = 1.05, MIRROR_H = 2.42, MIRROR_Y = 1.5, MIRROR_Z = -2.06, GLOW_PAD = 0.7;
+const blob = (w, h) => {
+  const pts = [];
+  for (let i = 0; i < 128; i++) {
+    const t = i / 128 * Math.PI * 2;
+    const x = w / 2 * Math.cos(t) * (1 + 0.1 * Math.sin(3 * t + 0.6)) + 0.08 * Math.sin(4 * Math.sin(t));
+    const y = h / 2 * Math.sin(t) * (1 + 0.04 * Math.sin(2 * t + 1.1));
+    pts.push(new THREE.Vector2(x, y));
+  }
+  return pts;
+};
+const mirrorOutline = blob(MIRROR_W, MIRROR_H);
+const mirror = new THREE.Group();
+mirror.position.set(WALL_X, MIRROR_Y, MIRROR_Z);
+mirror.rotation.y = Math.PI / 2;
+cur.add(mirror);
+cur = mirror;
+const glowTex = canvasTex(512, 1024, (x, w, h) => {
+  const sx = w / (MIRROR_W + GLOW_PAD), sy = h / (MIRROR_H + GLOW_PAD);
+  x.clearRect(0, 0, w, h);
+  x.beginPath();
+  mirrorOutline.forEach((p, i) => x[i ? 'lineTo' : 'moveTo'](w / 2 + p.x * sx, h / 2 - p.y * sy));
+  x.closePath();
+  x.shadowColor = '#ffc77a';
+  for (const blur of [70, 35]) { x.shadowBlur = blur; x.fillStyle = '#ffd9a0'; x.fill(); }
+});
+add(new THREE.Mesh(new THREE.PlaneGeometry(MIRROR_W + GLOW_PAD, MIRROR_H + GLOW_PAD),
+    new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, toneMapped: false, blending: THREE.AdditiveBlending })),
+    0, 0, 0.004, { cast: false });
+const glass = new THREE.MeshStandardMaterial({ color: '#d3dde3', roughness: 0.06, metalness: 0.3, emissive: '#eef6fa', emissiveIntensity: 0.22 });
+add(new THREE.Mesh(new THREE.ExtrudeGeometry(new THREE.Shape(mirrorOutline), { depth: 0.012, bevelEnabled: true, bevelSize: 0.006, bevelThickness: 0.006, bevelSegments: 2 }), glass),
+    0, 0, 0.03, { cast: false });
+const sheen = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.4, depthWrite: false });
+for (const [y, w, o] of [[0.32, 0.1, -0.02], [0.22, 0.045, 0.17], [-0.48, 0.07, -0.06]]) {
+  add(new THREE.Mesh(new THREE.PlaneGeometry(w, 0.62), sheen), o, y, 0.05, { rz: -0.55, cast: false });
+}
+const mirrorLight = new THREE.PointLight(0xffc98a, 0.7, 2.2, 2);
+mirrorLight.position.set(0, 0, 0.25);
+mirror.add(mirrorLight);
+
+// bird of paradise in a round white bowl, in the corner past the mirror
+part('paradise', 'above');
+const PX = -3.42, PZ = -3.0;
+add(new THREE.Mesh(new THREE.SphereGeometry(0.27, 32, 20, 0, Math.PI * 2, 0.55, Math.PI - 0.55), mat(C.white, 0.7)), PX, 0.25, PZ).scale.y = 0.95;
+cyl(0.225, 0.225, 0.01, mat('#e9e4dd', 0.9), PX, 0.46, PZ, { cast: false });
+for (let i = 0; i < 14; i++) sph(0.022, mat(i % 2 ? '#f4f1ec' : '#d9d3cb', 0.9), PX + Math.cos(i * 2.4) * 0.15 * ((i % 4) / 4 + 0.3), 0.47, PZ + Math.sin(i * 2.4) * 0.15 * ((i % 4) / 4 + 0.3), { cast: false });
+const leafShape = new THREE.Shape();
+leafShape.moveTo(0, 0);
+leafShape.bezierCurveTo(0.14, 0.12, 0.14, 0.5, 0, 0.7);
+leafShape.bezierCurveTo(-0.14, 0.5, -0.14, 0.12, 0, 0);
+const leafGeo = new THREE.ShapeGeometry(leafShape, 12);
+const leafMats = ['#3f7d4f', '#4f9160', '#2f6b42'].map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.55, side: THREE.DoubleSide }));
+// [stem length, heading around the pot, lean, leaf twist, leaf scale]
+[[1.05, 0.2, 0.1, 0.3, 1.1], [0.85, 1.3, 0.28, -0.6, 1.0], [0.7, 2.4, 0.38, 0.9, 0.9], [0.95, 3.4, 0.22, -0.2, 1.05],
+ [0.6, 4.4, 0.45, 0.5, 0.85], [0.8, 5.3, 0.3, -0.9, 0.95], [1.2, 2.9, 0.06, 1.4, 1.15]].forEach(([L, heading, lean, twist, k], i) => {
+  const stem = new THREE.Group();
+  stem.position.set(PX, 0.46, PZ);
+  stem.rotation.y = heading;
+  cur.add(stem);
+  const tip = new THREE.Group();
+  tip.rotation.z = -lean;
+  stem.add(tip);
+  const keep = cur;
+  cur = tip;
+  cyl(0.012, 0.016, L, mat('#5c8a4a', 0.6), 0, L / 2, 0, { seg: 8 });
+  const leaf = add(new THREE.Mesh(leafGeo, leafMats[i % 3]), 0, L - 0.02, 0, { rz: -0.15, ry: twist });
+  leaf.scale.setScalar(k);
+  cur = keep;
+});
+
+part('plants', 'above');
+// tall snake plant: flat pointed leaves fanning out of a white pot
+cyl(0.19, 0.15, 0.42, mat(C.white, 0.5), -3.42, 0.21, 2.45);
+cyl(0.17, 0.17, 0.02, mat('#5a3d33', 0.9), -3.42, 0.41, 2.45, { cast: false });
+[[0.95, 0.0, 0.05], [0.8, 1.2, -0.12], [1.05, 2.3, 0.1], [0.7, 3.4, -0.18], [0.88, 4.5, 0.14], [0.62, 5.5, 0.2], [0.75, 0.6, -0.08]].forEach(([h, a, tilt], i) => {
+  const leaf = add(new THREE.Mesh(new THREE.ConeGeometry(0.055, h, 4), mat(i % 2 ? '#4f8f6a' : '#6fa487', 0.6)),
+    -3.42 + Math.cos(a) * 0.06, 0.42 + h / 2, 2.45 + Math.sin(a) * 0.06, { ry: a, rz: tilt });
+  leaf.scale.z = 0.3;
+});
+// smaller bushy plant in a coral pot
+cyl(0.15, 0.12, 0.3, mat(C.coral, 0.6), -3.45, 0.15, 3.1);
+for (let i = 0; i < 9; i++) {
+  const a = i * 2.4, r = i ? 0.09 : 0;
+  sph(0.085, mat(i % 3 ? C.leaf : '#5b9476', 0.8), -3.45 + Math.cos(a) * r, 0.38 + (i % 3) * 0.05, 3.1 + Math.sin(a) * r);
+}
+
 /* ---- offcuts on the floor ---------------------------------------------- */
 part('offcuts', 'above');
 [[C.coral, -0.3, -1.4, 0.4], ['#f6c453', 0.3, -1.25, -0.6], [C.blush, 1.5, -1.45, 1.1], ['#5aa9e6', -0.9, -1.2, 2.0], [C.rose, 2.0, -1.1, 0.2]]
   .forEach(([c, x, z, r]) => box(0.16, 0.003, 0.1, mat(c, 0.6), x, 0.003, z, { ry: r, cast: false }));
-
-/* ---- string lights ----------------------------------------------------- */
-part('lights', 'above');
-const pts = [];
-for (let i = 0; i <= 22; i++) { const t = i / 22; pts.push(new THREE.Vector3(-3.7 + t * 7.6, 3.5 + Math.sin(t * Math.PI * 3) * 0.12 - Math.sin(t * Math.PI) * 0.1, WALL_Z + 0.05)); }
-add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 120, 0.01, 5, false), mat(C.ink)), 0, 0, 0, { cast: false });
-const bulbs = [];
-for (let i = 1; i < 22; i += 2) {
-  const m = new THREE.MeshStandardMaterial({ color: '#fff4d6', emissive: '#ffc98a', emissiveIntensity: 1.6 });
-  bulbs.push(m);
-  sph(0.045, m, pts[i].x, pts[i].y - 0.05, pts[i].z + 0.02, { cast: false });
-}
 
 /* ===================================================================
    Canvas drawings
@@ -653,13 +868,13 @@ const HOME = { pos: new THREE.Vector3(9.4, 7.6, 10.2), tgt: new THREE.Vector3(0,
 const FOCUS = {
   about:   { pos: new THREE.Vector3(1.1, 3.1, 3.4),   tgt: new THREE.Vector3(-3.4, 1.55, 0.45) },
   services:{ pos: new THREE.Vector3(2.0, 4.35, 3.6),  tgt: new THREE.Vector3(0.4, 0.95, -2.5) },
-  work:    { pos: new THREE.Vector3(0.4, 2.6, 6.3),   tgt: new THREE.Vector3(0.2, 2.25, -3.4) },
+  work:    { pos: new THREE.Vector3(0.55, 2.7, 6.0),  tgt: new THREE.Vector3(0.55, 2.55, -3.4) },
   contact: { pos: new THREE.Vector3(1.0, 2.95, 2.0),  tgt: new THREE.Vector3(-3.8, 2.8, 0.5) }
 };
 const PINS = {
   about:   { label: 'About me',  at: new THREE.Vector3(-3.45, 2.15, 0.45) },
   services:{ label: 'Services',  at: new THREE.Vector3(X0, 1.5, Z0) },
-  work:    { label: 'Portfolio', at: new THREE.Vector3(0.2, 3.15, WALL_Z) },
+  work:    { label: 'Portfolio', at: new THREE.Vector3(0.55, 3.3, WALL_Z) },
   contact: { label: 'Contact',   at: new THREE.Vector3(-3.75, 3.32, 0.5) }
 };
 
@@ -862,7 +1077,6 @@ function frameLoop() {
     if (!reduced) poseMJ(0.5 - 0.5 * Math.cos(t * 1.4));
   }
   if (avatar) { avatar.vrm.update(dt); placeSqueegee(); }
-  bulbs.forEach((m, i) => { m.emissiveIntensity = reduced ? 1.5 : 1.3 + Math.sin(t * 2 + i * 1.7) * 0.4; });
   const flicker = !built || reduced ? 1 : (Math.sin(t * 37) > 0.97 ? 0.75 : 1);
   neonMat.opacity = flicker;
   neonLight.intensity = 2.2 * flicker;
